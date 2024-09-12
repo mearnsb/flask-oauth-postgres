@@ -7,7 +7,6 @@ from gunicorn.app.base import BaseApplication
 
 #from dotenv import load_dotenv
 #load_dotenv()
-
 # Third-party libraries
 from flask import Flask, redirect, request, url_for, jsonify, make_response, session
 from flask_login import (LoginManager,current_user,login_required,login_user,logout_user, )
@@ -31,8 +30,6 @@ GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", None)
 GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", None)
 GOOGLE_DISCOVERY_URL = ("https://accounts.google.com/.well-known/openid-configuration")
 WEB_APP_URL = os.environ.get("WEB_APP_URL", "http://127.0.0.1:8501")
-# https://app.bmearns.com
-# https://flask-oauth-6nqow662ca-uc.a.run.app
 
 HTTP="http://"
 HTTPS="https://"
@@ -42,7 +39,6 @@ if "http://" in WEB_APP_URL:
 # Flask app setup
 app = Flask(__name__)
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
-#app.config['REMEMBER_COOKIE_SECURE'] = False
 app.config['REMEMBER_COOKIE_HTTPONLY'] = False
 app.config['REMEMBER_COOKIE_NAME'] = 'streamlit_remember' 
 app.secret_key = SK or os.urandom(24)
@@ -106,7 +102,7 @@ def load_user_from_request(request):
 def show_session():
     header = request.headers.get("X-Forwarded-For")
     address = request.headers.get("X-Forwarded-For", request.remote_addr)
-    #lask_login.utils.encode_cookie(session['_user_id']))
+    #flask_login.utils.encode_cookie(session['_user_id']))
     #token = current_user.get_auth_token()
     
     # An 'X-Forwarded-For' header includes a comma separated list of the
@@ -176,10 +172,10 @@ def get_google_provider_cfg():
 @app.route("/userinfo")
 def userinfo():
     try:
-        print("userinfo:")
-        print("current_user: " + str(current_user.email))
-        print("current_user: " + str(current_user.is_authenticated))
-        print("current_user: " + str(current_user.email_verified))
+        # print("userinfo:")
+        # print("current_user: " + str(current_user.email))
+        # print("current_user: " + str(current_user.is_authenticated))
+        # print("current_user: " + str(current_user.email_verified))
         if current_user.is_authenticated == True and current_user.email_verified == 'True':
             return current_user.__dict__
     except Exception as e:
@@ -201,7 +197,7 @@ def login():
     print(request.base_url)
     request_uri = client.prepare_request_uri(
         authorization_endpoint,
-        redirect_uri= request.base_url.replace(HTTP, HTTPS) + "/callback", #"https://flask-oauth-6nqow662ca-uc.a.run.app/login/callback", #
+        redirect_uri= request.base_url.replace(HTTP, HTTPS) + "/callback", #"https://flask-oauth-uc.a.run.app/login/callback", #
         scope=["openid", "email", "profile"],
     )
     print(request.base_url)
@@ -226,12 +222,12 @@ def callback():
         code=code
     )
     
-    print(request.url)
-    print(request.base_url)
-    print("base_url: " + str(request.base_url).replace(HTTP, HTTPS))
-    print(headers)
-    print(body)
-    print(token_url)
+    # print(request.url)
+    # print(request.base_url)
+    # print("base_url: " + str(request.base_url).replace(HTTP, HTTPS))
+    # print(headers)
+    # print(body)
+    # print(token_url)
     
     token_response = requests.post(
         token_url,
@@ -283,7 +279,7 @@ def callback():
     print("WEB_APP_URL: " + str(WEB_APP_URL))
     
     # set cookie
-    #response = make_response(redirect("https://flask-oauth-6nqow662ca-uc.a.run.app"))
+    #response = make_response(redirect("https://flask-oauth-uc.a.run.app"))
     response = make_response(redirect("/?email="+users_email)) #WEB_APP_URL
     s = URLSafeSerializer(SK)
     enc_str = s.dumps({'user_id' : unique_id, 'name' :  users_name, 'email' : users_email})
@@ -307,9 +303,8 @@ def logout():
         response = make_response(redirect("/")) 
         response.set_cookie('x-session_id', '', expires=0, domain="bmearns.com")
         response.set_cookie('x-session_id', '', expires=0, domain="127.0.0.1")
-        response.set_cookie('x-session_id', '', expires=0, domain="flask-oauth-6nqow662ca-uc.a.run.app")
-        print("cookie_deleted") 
-        
+        #response.set_cookie('x-session_id', '', expires=0, domain="flask-oauth-uc.a.run.app")
+        #print("cookie_deleted") 
         
     except Exception as e:
         print(str(e))
@@ -318,7 +313,6 @@ def logout():
 #if __name__ == "__main__":
 #    app.run(port=5000, debug=True)
 #    #app.run(ssl_context="adhoc")
-
 
 class StandaloneApplication(BaseApplication):
     def __init__(self, app, options=None):
@@ -338,9 +332,7 @@ class StandaloneApplication(BaseApplication):
     def load(self):
         return self.application
 
-
 # Do not remove the main function while updating the app.
 if __name__ == "__main__":
-    #options = {"bind": "%s:%s" % ("0.0.0.0", "5001"), "workers": 2, "loglevel": "info"}
     options = {"bind": "0.0.0.0:5001", "workers": 1, "loglevel": "info"}
     StandaloneApplication(app, options).run()
