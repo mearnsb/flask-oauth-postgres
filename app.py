@@ -29,10 +29,14 @@ SK = os.environ.get('SECRET_KEY')
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", None)
 GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", None)
 GOOGLE_DISCOVERY_URL = ("https://accounts.google.com/.well-known/openid-configuration")
-WEB_APP_URL = os.environ.get("WEB_APP_URL", "http://127.0.0.1:8501")
+
+# Edit Dev Mode#WEB_APP_URL = os.environ.get("WEB_APP_URL", "http://127.0.0.1:8501")
+WEB_APP_URL = os.environ.get("WEB_APP_URL", "https://login.bmearns.com")
 
 HTTP="http://"
 HTTPS="https://"
+
+# Edit Dev
 if "http://" in WEB_APP_URL:
     HTTPS="http://"
     
@@ -139,13 +143,18 @@ def index():
             '<p></p>'
             '<a class="button" href="https://chat.bmearns.com">chat.bmearns.com (Chat with Documentation)</a>'
             '<p></p>'
-            '<a class="button" href="https://chat.bmearns.com">gitlit.bmearns.com (Fake Data Generator)</a>'
-
-            '<h2>Dev</h2>'
-            '<a class="button" href="http://127.0.0.1:5001/logout">logout</a>'
+            '<a class="button" href="https://gitlit.bmearns.com">gitlit.bmearns.com (Fake Data Generator)</a>'
             '<p></p>'
-            '<a class="button" href="http://127.0.0.1:8501">app</a>'.format(current_user.name, current_user.email, current_user.profile_pic, verified )
-        )
+            '<a class="button" href="https://sqlsaw.bmearns.com">sqlsaw.bmearns.com (Data Playground)</a>'
+            '<p></p>'
+            '<a class="button" href="https://duckdq.bmearns.com">duckdq.bmearns.com (LangGraph)</a>'
+
+            # Edit Dev
+            # '<h2>Dev</h2>'
+            # '<a class="button" href="http://127.0.0.1:5001/logout">logout</a>'
+            # '<p></p>'
+            # '<a class="button" href="http://127.0.0.1:8501">app</a>'
+        ).format(current_user.name, current_user.email, current_user.profile_pic, verified )
     else:
         return (
             '<h2>Access</h2>'
@@ -158,12 +167,16 @@ def index():
             '<p></p>'
             '<a class="button" href="https://chat.bmearns.com">chat.bmearns.com (Chat with Documentation)</a>'
             '<p></p>'
-            '<a class="button" href="https://chat.bmearns.com">gitlit.bmearns.com (Fake Data Generator)</a>'
-            
-            '<h2>Dev</h2>'
-            '<a class="button" href="http://127.0.0.1:5001/login">login</a>'
+            '<a class="button" href="https://gitlit.bmearns.com">gitlit.bmearns.com (Fake Data Generator)</a>'
             '<p></p>'
-            '<a class="button" href="http://127.0.0.1:8501">app</a>'
+            '<a class="button" href="https://sqlsaw.bmearns.com">sqlsaw.bmearns.com (Data Playground)</a>'
+            '<p></p>'
+            '<a class="button" href="https://duckdq.bmearns.com">duckdq.bmearns.com (LangGraph)</a>'
+            
+            # '<h2>Dev</h2>'
+            # '<a class="button" href="http://127.0.0.1:5001/login">login</a>'
+            # '<p></p>'
+            # '<a class="button" href="http://127.0.0.1:8501">app</a>'
        )
 
 def get_google_provider_cfg():
@@ -195,6 +208,8 @@ def login():
 
     # Use library to construct the request for Google login and provide
     print(request.base_url)
+    print("base_url: " + request.base_url)
+    print("base_url_replace: " + request.base_url.replace(HTTP, HTTPS))
     request_uri = client.prepare_request_uri(
         authorization_endpoint,
         redirect_uri= request.base_url.replace(HTTP, HTTPS) + "/callback", #"https://flask-oauth-uc.a.run.app/login/callback", #
